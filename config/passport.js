@@ -2,6 +2,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var LocalFormStrategy = require('passport-local-forms').Strategy;
 var forms = require('forms'),fields = forms.fields;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var fbStrategy = require('passport-facebook').Strategy;
 var authConfig = require('../config/googleauth.json');
 // var User = require('../models/user');
 var mysql = require('mysql');
@@ -23,13 +24,28 @@ var loginForm = forms.create({
 
 module.exports = function(passport){
 	passport.serializeUser(function(user, done){
+
+		if(user.provider=='facebook' || user.provider=='google'){
+			done(null, user);
+		}else{
+			done(null, user);
+		}
 		//console.log('serializeUser: ' + user.email);
 		//console.log('serializeUser: ' + user.emails[0].value);
-		//done(null, user.email);
-		done(null, user);
+
+		//done(null, user);
 	});
 
-	passport.deserializeUser(function(email, done){
+	passport.deserializeUser(function(user, done){
+		if(user.provider=='facebook' || user.provider=='google'){
+			done(null, user);
+		}else{
+			//done(null, user.email);
+			var email1=user.email;
+			connection.query("select * from users where email = ? ",[email1], function(err, results, fields){
+			 done(err, results[0]);
+			 });
+		}
 		// User.findById(id, function(err, user){
 		// 	done(err, user);
 		// });
@@ -38,7 +54,7 @@ module.exports = function(passport){
 			done(err, results[0]);
 		});*/
 
-		 done(null, email);
+		 //done(null, email);
 	});
 
 	passport.use('local-signup', new LocalStrategy({
@@ -171,4 +187,16 @@ module.exports = function(passport){
 		}
 	));
 
+	passport.use('fbauthStretagy',new fbStrategy(
+		// Use the API access settings stored in ./config/auth.json. You must create
+		// an OAuth 2 client ID and secret at: https://console.developers.google.com
+		authConfig.facebook,
+
+		function(accessToken, refreshToken, profile, done) {
+			// Typically you would query the database to find the user record
+			// associated with this Google profile, then pass that object to the `done`
+			// callback.
+			return done(null, profile);
+		}
+	));
 };

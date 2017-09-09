@@ -6,5 +6,12 @@
         "callbackURL": "http://localhost:4200/auth/google/callback",
       "realm":"http://localhost:4200/"
 
+    },
+    "facebook": {
+        "clientID": "272317889929636",
+        "clientSecret": "ff99565844c033947a3ccc575980fc66",
+        "callbackURL": "http://localhost:4200/auth/fb/callback",
+        "realm":"http://localhost:4200/"
+
     }
 }
